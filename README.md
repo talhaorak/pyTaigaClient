@@ -7,6 +7,7 @@ A Python client library for interacting with the [Taiga API](https://docs.taiga.
 [Taiga](https://taiga.io/) is an open-source project management platform for agile teams. It features support for Scrum and Kanban methodologies, issue tracking, and project management. The Taiga API allows for programmatic access to all Taiga features, enabling automation and integration with other tools.
 
 For detailed API documentation, visit the [official Taiga API documentation](https://docs.taiga.io/api.html).
+
 ## Installation
 
 ### Using uv (recommended)
@@ -136,17 +137,20 @@ attachment = client.upload_attachment(
 ### Setup Development Environment
 
 1. Clone the repository:
+
    ```bash
-   git clone https://github.com/yourusername/pytaigaclient.git
+   git clone https://github.com/talhaorak/pytaigaclient.git
    cd pytaigaclient
    ```
 
 2. Create a virtual environment using uv:
+
    ```bash
    uv venv --python=cpython-3.13.2-macos-aarch64-none .venv
    ```
 
 3. Activate the virtual environment:
+
    ```bash
    source .venv/bin/activate  # On Unix/macOS
    # or
@@ -154,6 +158,7 @@ attachment = client.upload_attachment(
    ```
 
 4. Install development dependencies:
+
    ```bash
    uv pip install -e ".[dev]"
    ```
@@ -180,4 +185,3 @@ mypy src
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-

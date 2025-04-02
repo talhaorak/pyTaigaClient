@@ -3,7 +3,7 @@ import logging
 from typing import Optional, Dict, Any, List, Union, IO
 from urllib.parse import urljoin
 
-from .exceptions import TaigaAPIError, handle_api_error
+from .exceptions import TaigaException, handle_api_error
 from .resources.auth import Auth
 from .resources.projects import Projects
 from .resources.milestones import Milestones
