@@ -1,10 +1,10 @@
 # taiga_client/resources/auth.py
 
-from typing import TYPE_CHECKING, Optional, Dict, Any
+from typing import TYPE_CHECKING, Optional, Dict, Any, cast
 
 if TYPE_CHECKING:
     # Avoid circular import for type hinting
-    from taiga_client.client import TaigaClient
+    from pytaigaclient.client import TaigaClient
 
 
 class Auth:
@@ -48,11 +48,13 @@ class Auth:
         # Auth endpoint doesn't require prior authentication token
         current_auth = self._client.session.headers.pop("Authorization", None)
         try:
-            response_data = self._client.post(
-                "/auth", json=payload)  # Use client's _request method
+            # Use cast to inform the type checker about the expected type
+            response_data = cast(Dict[str, Any], self._client.post(
+                "/auth", json=payload))  # Use client's _request method
             if response_data and 'auth_token' in response_data:
+                auth_token: str = response_data['auth_token']
                 self._client.update_token(
-                    auth_token=response_data['auth_token'],
+                    auth_token=auth_token,
                     token_type="Bearer"  # Normal login uses Bearer token
                 )
                 # Optionally store refresh token if needed for auto-refresh logic
@@ -94,7 +96,9 @@ class Auth:
 
         current_auth = self._client.session.headers.pop("Authorization", None)
         try:
-            response_data = self._client.post("/auth", json=payload)
+            # Use cast to inform the type checker about the expected type
+            response_data = cast(
+                Dict[str, Any], self._client.post("/auth", json=payload))
             if response_data and 'auth_token' in response_data:
                 self._client.update_token(
                     auth_token=response_data['auth_token'],
@@ -130,7 +134,9 @@ class Auth:
         payload = {"refresh": refresh_token}
         current_auth = self._client.session.headers.pop("Authorization", None)
         try:
-            response_data = self._client.post("/auth/refresh", json=payload)
+            # Use cast to inform the type checker about the expected type
+            response_data = cast(Dict[str, Any], self._client.post(
+                "/auth/refresh", json=payload))
             if response_data and 'auth_token' in response_data:
                 self._client.update_token(
                     auth_token=response_data['auth_token'],
@@ -178,7 +184,9 @@ class Auth:
         current_auth = self._client.session.headers.pop("Authorization", None)
         try:
             # Use raise_exception=False to potentially handle specific registration errors if needed
-            response_data = self._client.post("/auth/register", json=payload)
+            # Use cast to inform the type checker about the expected type
+            response_data = cast(Dict[str, Any], self._client.post(
+                "/auth/register", json=payload))
             # Decide if registration should automatically log in the user
             # if response_data and 'auth_token' in response_data:
             #    self._client.update_token(response_data['auth_token'], "Bearer")
@@ -237,10 +245,11 @@ class Auth:
                     "Email and full_name are required when 'existing' is False.")
             payload["email"] = email
             payload["full_name"] = full_name
-
         current_auth = self._client.session.headers.pop("Authorization", None)
         try:
-            response_data = self._client.post("/auth/register", json=payload)
+            # Use cast to inform the type checker about the expected type
+            response_data = cast(Dict[str, Any], self._client.post(
+                "/auth/register", json=payload))
             if response_data and 'auth_token' in response_data:
                 self._client.update_token(
                     auth_token=response_data['auth_token'],

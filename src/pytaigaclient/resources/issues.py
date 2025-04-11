@@ -45,7 +45,8 @@ class Issues(Resource):
         payload = {"project": project, "subject": subject}
         if data:
             payload.update(data)
-        return self.client.post(endpoint, json=payload)
+        result = self.client.post(endpoint, json=payload)
+        return result if isinstance(result, dict) else {}
 
     def get(self, issue_id: int) -> Dict[str, Any]:
         """
@@ -58,7 +59,8 @@ class Issues(Resource):
             Issue detail object.
         """
         endpoint = f"/issues/{issue_id}"
-        return self.client.get(endpoint)
+        result = self.client.get(endpoint)
+        return result if isinstance(result, dict) else {}
 
     def get_by_ref(
         self, ref: int, project: Union[int, str]
@@ -74,12 +76,14 @@ class Issues(Resource):
             Issue detail object.
         """
         endpoint = "/issues/by_ref"
-        params = {"ref": ref}
+        params: Dict[str, Union[int, str]] = {"ref": ref}
         if isinstance(project, int):
             params["project"] = project
         else:
-            params["project__slug"] = project # Docs mention project__slug, API might differ slightly from US/Task
-        return self.client.get(endpoint, params=params)
+            # Docs mention project__slug, API might differ slightly from US/Task
+            params["project__slug"] = project
+        result = self.client.get(endpoint, params=params)
+        return result if isinstance(result, dict) else {}
 
     def edit(self, issue_id: int, version: int, data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -96,7 +100,8 @@ class Issues(Resource):
         endpoint = f"/issues/{issue_id}"
         payload = {"version": version}
         payload.update(data)
-        return self.client.patch(endpoint, json=payload)
+        result = self.client.patch(endpoint, json=payload)
+        return result if isinstance(result, dict) else {}
 
     def update(self, issue_id: int, version: int, data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -113,7 +118,8 @@ class Issues(Resource):
         endpoint = f"/issues/{issue_id}"
         payload = data.copy()
         payload["version"] = version
-        return self.client.put(endpoint, json=payload)
+        result = self.client.put(endpoint, json=payload)
+        return result if isinstance(result, dict) else {}
 
     def delete(self, issue_id: int) -> Optional[Any]:
         """
@@ -140,7 +146,8 @@ class Issues(Resource):
         """
         endpoint = "/issues/filters_data"
         params = {"project": project}
-        return self.client.get(endpoint, params=params)
+        result = self.client.get(endpoint, params=params)
+        return result if isinstance(result, dict) else {}
 
     def upvote(self, issue_id: int) -> Optional[Any]:
         """
@@ -257,7 +264,8 @@ class Issues(Resource):
             The newly created attachment detail object, or None if error.
         """
         endpoint = "/issues/attachments"
-        data = {"project": project, "object_id": object_id}
+        data: Dict[str, Union[int, str, bool]] = {
+            "project": project, "object_id": object_id}
         if description is not None:
             data["description"] = description
         if is_deprecated is not None:

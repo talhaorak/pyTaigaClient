@@ -78,7 +78,9 @@ class CustomAttributes(Resource):
         Returns:
             The updated custom attribute detail object.
         """
-        return self.client.patch(f"{self.endpoint}/{custom_attr_id}", json=kwargs)
+        result = self.client.patch(
+            f"{self.endpoint}/{custom_attr_id}", json=kwargs)
+        return cast(Dict[str, Any], result)
 
     def update(self, custom_attr_id: int, data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -91,7 +93,9 @@ class CustomAttributes(Resource):
         Returns:
             The updated custom attribute detail object.
         """
-        return self.client.put(f"{self.endpoint}/{custom_attr_id}", json=data)
+        result = self.client.put(
+            f"{self.endpoint}/{custom_attr_id}", json=data)
+        return cast(Dict[str, Any], result)
 
     def delete(self, custom_attr_id: int) -> None:
         """
@@ -128,7 +132,7 @@ class CustomAttributes(Resource):
         Returns:
             Object containing all custom attribute values for the entity.
         """
-        return self.client.get(f"{self.values_endpoint}/{entity_id}")
+        return cast(Dict[str, Any], self.client.get(f"{self.values_endpoint}/{entity_id}"))
 
     def update_values(self, entity_id: int, version: int, attributes_values: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -147,7 +151,9 @@ class CustomAttributes(Resource):
             "version": version,
             "attributes_values": attributes_values
         }
-        return self.client.patch(f"{self.values_endpoint}/{entity_id}", json=payload)
+        result = self.client.patch(
+            f"{self.values_endpoint}/{entity_id}", json=payload)
+        return cast(Dict[str, Any], result)
 
 
 class UserStoryCustomAttributes(CustomAttributes):
