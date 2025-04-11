@@ -3,26 +3,19 @@
 from typing import TYPE_CHECKING, Optional, Dict, Any, List, IO, Union
 import os
 
+from .base import Resource
+
 if TYPE_CHECKING:
     # Avoid circular import for type hinting
-    from taiga_client.client import TaigaClient
+    from ..client import TaigaClient
 
 
-class Projects:
+class Projects(Resource):
     """
     Handles project related endpoints for the Taiga API.
     Provides methods for listing, creating, retrieving, updating, deleting projects,
     managing tags, watchers, fans, logos, transfers, templates, and stats.
     """
-
-    def __init__(self, client: 'TaigaClient'):
-        """
-        Initializes the Projects resource.
-
-        Args:
-            client: The TaigaClient instance.
-        """
-        self._client = client
 
     def list(self, **query_params) -> List[Dict[str, Any]]:
         """
@@ -40,7 +33,7 @@ class Projects:
         Returns:
             A list of dictionaries, each representing a project list entry.
         """
-        return self._client.get("/projects", params=query_params)
+        return self.client.get("/projects", params=query_params)
 
     def create(self, name: str, description: str, **kwargs) -> Dict[str, Any]:
         """
@@ -60,7 +53,7 @@ class Projects:
             A dictionary representing the newly created project details.
         """
         payload = {"name": name, "description": description, **kwargs}
-        return self._client.post("/projects", json=payload)
+        return self.client.post("/projects", json=payload)
 
     def get(self, project_id: int) -> Dict[str, Any]:
         """
@@ -74,7 +67,7 @@ class Projects:
         Returns:
             A dictionary representing the project details.
         """
-        return self._client.get(f"/projects/{project_id}")
+        return self.client.get(f"/projects/{project_id}")
 
     def get_by_slug(self, slug: str) -> Dict[str, Any]:
         """
@@ -88,7 +81,7 @@ class Projects:
         Returns:
             A dictionary representing the project details.
         """
-        return self._client.get("/projects/by_slug", params={"slug": slug})
+        return self.client.get("/projects/by_slug", params={"slug": slug})
 
     def edit(self, project_id: int, version: int, **kwargs) -> Dict[str, Any]:
         """
@@ -109,7 +102,7 @@ class Projects:
             TaigaConcurrencyError: If the provided version does not match the server's version.
         """
         payload = {"version": version, **kwargs}
-        return self._client.patch(f"/projects/{project_id}", json=payload)
+        return self.client.patch(f"/projects/{project_id}", json=payload)
 
     def update(self, project_id: int, version: int, project_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -132,7 +125,7 @@ class Projects:
         """
         # Ensure version is included if not already in project_data
         project_data['version'] = version
-        return self._client.put(f"/projects/{project_id}", json=project_data)
+        return self.client.put(f"/projects/{project_id}", json=project_data)
 
     def delete(self, project_id: int) -> None:
         """
@@ -143,7 +136,7 @@ class Projects:
         Args:
             project_id: The ID of the project to delete.
         """
-        self._client.delete(f"/projects/{project_id}")
+        self.client.delete(f"/projects/{project_id}")
 
     def bulk_update_order(self, order_updates: List[Dict[str, Any]]) -> None:
         """
@@ -156,7 +149,7 @@ class Projects:
                            'project_id' (int) and 'order' (int).
                            Example: [{'project_id': 1, 'order': 10}, {'project_id': 2, 'order': 15}]
         """
-        self._client.post("/projects/bulk_update_order", json=order_updates)
+        self.client.post("/projects/bulk_update_order", json=order_updates)
 
     def get_modules_config(self, project_id: int) -> Dict[str, Any]:
         """
@@ -170,7 +163,7 @@ class Projects:
         Returns:
             A dictionary representing the modules configuration.
         """
-        return self._client.get(f"/projects/{project_id}/modules")
+        return self.client.get(f"/projects/{project_id}/modules")
 
     def edit_modules_config(self, project_id: int, **kwargs) -> None:
         """
@@ -183,7 +176,7 @@ class Projects:
             **kwargs: A dictionary representing the module configurations to update.
                       Example: github={'secret': 'new_secret'}
         """
-        self._client.patch(f"/projects/{project_id}/modules", json=kwargs)
+        self.client.patch(f"/projects/{project_id}/modules", json=kwargs)
 
     def stats(self, project_id: int) -> Dict[str, Any]:
         """
@@ -197,7 +190,7 @@ class Projects:
         Returns:
             A dictionary containing project statistics.
         """
-        return self._client.get(f"/projects/{project_id}/stats")
+        return self.client.get(f"/projects/{project_id}/stats")
 
     def issue_stats(self, project_id: int) -> Dict[str, Any]:
         """
@@ -211,7 +204,7 @@ class Projects:
         Returns:
             A dictionary containing issue statistics.
         """
-        return self._client.get(f"/projects/{project_id}/issues_stats")
+        return self.client.get(f"/projects/{project_id}/issues_stats")
 
     def get_tag_colors(self, project_id: int) -> Dict[str, Optional[str]]:
         """
@@ -225,7 +218,7 @@ class Projects:
         Returns:
             A dictionary where keys are tag names and values are HEX color strings or None.
         """
-        return self._client.get(f"/projects/{project_id}/tags_colors")
+        return self.client.get(f"/projects/{project_id}/tags_colors")
 
     def create_tag(self, project_id: int, tag: str, color: Optional[str] = None) -> None:
         """
@@ -239,7 +232,7 @@ class Projects:
             color: Optional HEX color string (e.g., "#FF0000").
         """
         payload = {"tag": tag, "color": color}
-        self._client.post(f"/projects/{project_id}/create_tag", json=payload)
+        self.client.post(f"/projects/{project_id}/create_tag", json=payload)
 
     def edit_tag(self, project_id: int, from_tag: str, to_tag: str, color: Optional[str] = None) -> None:
         """
@@ -254,7 +247,7 @@ class Projects:
             color: Optional new HEX color string. If omitted, color remains unchanged or is removed if set to None.
         """
         payload = {"from_tag": from_tag, "to_tag": to_tag, "color": color}
-        self._client.post(f"/projects/{project_id}/edit_tag", json=payload)
+        self.client.post(f"/projects/{project_id}/edit_tag", json=payload)
 
     def delete_tag(self, project_id: int, tag: str) -> None:
         """
@@ -267,7 +260,7 @@ class Projects:
             tag: The name of the tag to delete.
         """
         payload = {"tag": tag}
-        self._client.post(f"/projects/{project_id}/delete_tag", json=payload)
+        self.client.post(f"/projects/{project_id}/delete_tag", json=payload)
 
     def mix_tags(self, project_id: int, from_tags: List[str], to_tag: str) -> None:
         """
@@ -282,7 +275,7 @@ class Projects:
             to_tag: The target tag name.
         """
         payload = {"from_tags": from_tags, "to_tag": to_tag}
-        self._client.post(f"/projects/{project_id}/mix_tags", json=payload)
+        self.client.post(f"/projects/{project_id}/mix_tags", json=payload)
 
     def like(self, project_id: int) -> None:
         """
@@ -293,7 +286,7 @@ class Projects:
         Args:
             project_id: The ID of the project.
         """
-        self._client.post(f"/projects/{project_id}/like")
+        self.client.post(f"/projects/{project_id}/like")
 
     def unlike(self, project_id: int) -> None:
         """
@@ -304,7 +297,7 @@ class Projects:
         Args:
             project_id: The ID of the project.
         """
-        self._client.post(f"/projects/{project_id}/unlike")
+        self.client.post(f"/projects/{project_id}/unlike")
 
     def list_fans(self, project_id: int) -> List[Dict[str, Any]]:
         """
@@ -318,7 +311,7 @@ class Projects:
         Returns:
             A list of dictionaries, each representing a fan (user).
         """
-        return self._client.get(f"/projects/{project_id}/fans")
+        return self.client.get(f"/projects/{project_id}/fans")
 
     def watch(self, project_id: int, notify_level: Optional[int] = None) -> None:
         """
@@ -333,7 +326,7 @@ class Projects:
         payload = {}
         if notify_level is not None:
             payload["notify_level"] = notify_level
-        self._client.post(
+        self.client.post(
             f"/projects/{project_id}/watch", json=payload if payload else None)
 
     def unwatch(self, project_id: int) -> None:
@@ -345,7 +338,7 @@ class Projects:
         Args:
             project_id: The ID of the project.
         """
-        self._client.post(f"/projects/{project_id}/unwatch")
+        self.client.post(f"/projects/{project_id}/unwatch")
 
     def list_watchers(self, project_id: int) -> List[Dict[str, Any]]:
         """
@@ -359,7 +352,7 @@ class Projects:
         Returns:
             A list of dictionaries, each representing a watcher (user).
         """
-        return self._client.get(f"/projects/{project_id}/watchers")
+        return self.client.get(f"/projects/{project_id}/watchers")
 
     def create_template_from_project(self, project_id: int, template_name: str, template_description: str) -> Dict[str, Any]:
         """
@@ -378,7 +371,7 @@ class Projects:
         """
         payload = {"template_name": template_name,
                    "template_description": template_description}
-        return self._client.post(f"/projects/{project_id}/create_template", json=payload)
+        return self.client.post(f"/projects/{project_id}/create_template", json=payload)
 
     def leave(self, project_id: int) -> None:
         """
@@ -390,7 +383,7 @@ class Projects:
         Args:
             project_id: The ID of the project to leave.
         """
-        self._client.post(f"/projects/{project_id}/leave")
+        self.client.post(f"/projects/{project_id}/leave")
 
     def change_logo(self, project_id: int, logo_file: Union[str, IO]) -> Dict[str, Any]:
         """
@@ -413,13 +406,13 @@ class Projects:
             with open(file_path, 'rb') as f:
                 # Define filename for the multipart request part
                 files = {'logo': (os.path.basename(file_path), f)}
-                return self._client.post(f"/projects/{project_id}/change_logo", files=files)
+                return self.client.post(f"/projects/{project_id}/change_logo", files=files)
         else:
             # Assume it's an already opened file-like object (opened in binary mode)
             # You might need to determine a filename if the API requires it
             files = {'logo': ('uploaded_logo', logo_file)
                      }  # Use a generic filename
-            return self._client.post(f"/projects/{project_id}/change_logo", files=files)
+            return self.client.post(f"/projects/{project_id}/change_logo", files=files)
 
     def remove_logo(self, project_id: int) -> Dict[str, Any]:
         """
@@ -433,7 +426,7 @@ class Projects:
         Returns:
             A dictionary representing the updated project details (with logo URLs set to null).
         """
-        return self._client.post(f"/projects/{project_id}/remove_logo")
+        return self.client.post(f"/projects/{project_id}/remove_logo")
 
     def transfer_validate_token(self, project_id: int, token: str) -> None:
         """
@@ -446,7 +439,7 @@ class Projects:
             token: The transfer token received (usually via email).
         """
         payload = {"token": token}
-        self._client.post(
+        self.client.post(
             f"/projects/{project_id}/transfer_validate_token", json=payload)
 
     def transfer_request(self, project_id: int) -> None:
@@ -459,7 +452,7 @@ class Projects:
         Args:
             project_id: The ID of the project to request transfer for.
         """
-        self._client.post(f"/projects/{project_id}/transfer_request")
+        self.client.post(f"/projects/{project_id}/transfer_request")
 
     def transfer_start(self, project_id: int, user_id: int) -> None:
         """
@@ -473,7 +466,7 @@ class Projects:
             user_id: The ID of the target admin user to transfer ownership to.
         """
         payload = {"user": user_id}
-        self._client.post(
+        self.client.post(
             f"/projects/{project_id}/transfer_start", json=payload)
 
     def transfer_accept(self, project_id: int, token: str, reason: Optional[str] = None) -> None:
@@ -489,7 +482,7 @@ class Projects:
             reason: Optional reason included in the email response to the original owner.
         """
         payload = {"token": token, "reason": reason}
-        self._client.post(
+        self.client.post(
             f"/projects/{project_id}/transfer_accept", json=payload)
 
     def transfer_reject(self, project_id: int, token: str, reason: Optional[str] = None) -> None:
@@ -504,7 +497,7 @@ class Projects:
             reason: Optional reason included in the email response to the original owner.
         """
         payload = {"token": token, "reason": reason}
-        self._client.post(
+        self.client.post(
             f"/projects/{project_id}/transfer_reject", json=payload)
 
     def duplicate(self, project_id: int, name: str, description: str, is_private: bool, users: Optional[List[Dict[str, int]]] = None) -> Dict[str, Any]:
@@ -531,4 +524,4 @@ class Projects:
         }
         if users is not None:
             payload["users"] = users  # Add only if provided
-        return self._client.post(f"/projects/{project_id}/duplicate", json=payload)
+        return self.client.post(f"/projects/{project_id}/duplicate", json=payload)

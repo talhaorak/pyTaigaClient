@@ -41,6 +41,9 @@ def create_project(cli: TaigaClient, name: str, description: str) -> Optional[in
 
 if __name__ == "__main__":
     cli = login("test", "test")
+    if cli is None:
+        print("Login failed.")
+        exit(1)
     project_id = create_project(cli, "Test Project", "This is a test project.")
     if project_id:
         print(f"Project created with ID: {project_id}")

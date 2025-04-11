@@ -13,7 +13,20 @@ from .resources.issues import Issues
 from .resources.wiki import Wiki
 from .resources.memberships import Memberships
 from .resources.users import Users
-# Import other resource classes here
+from .resources.issue_statuses import IssueStatuses
+from .resources.issue_types import IssueTypes
+from .resources.issue_priorities import IssuePriorities
+from .resources.issue_severities import IssueSeverities
+from .resources.epics import Epics
+from .resources.points import Points
+from .resources.userstory_statuses import UserStoryStatuses
+from .resources.custom_attributes import (
+    UserStoryCustomAttributes, TaskCustomAttributes,
+    IssueCustomAttributes, EpicCustomAttributes
+)
+from .resources.webhooks import Webhooks
+from .resources.search import Search
+from .resources.timeline import Timeline
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +84,24 @@ class TaigaClient:
         self.wiki = Wiki(self)
         self.memberships = Memberships(self)
         self.users = Users(self)
-        # Add other resource initializations here
+        self.issue_statuses = IssueStatuses(self)
+        self.issue_types = IssueTypes(self)
+        self.issue_priorities = IssuePriorities(self)
+        self.issue_severities = IssueSeverities(self)
+
+        # New resources
+        self.epics = Epics(self)
+        self.points = Points(self)
+        self.userstory_statuses = UserStoryStatuses(self)
+        self.webhooks = Webhooks(self)
+        self.search = Search(self)
+        self.timeline = Timeline(self)
+
+        # Custom attributes
+        self.userstory_custom_attributes = UserStoryCustomAttributes(self)
+        self.task_custom_attributes = TaskCustomAttributes(self)
+        self.issue_custom_attributes = IssueCustomAttributes(self)
+        self.epic_custom_attributes = EpicCustomAttributes(self)
 
     def update_token(self, auth_token: Optional[str], token_type: str = "Bearer"):
         """Updates the authentication token and type."""
